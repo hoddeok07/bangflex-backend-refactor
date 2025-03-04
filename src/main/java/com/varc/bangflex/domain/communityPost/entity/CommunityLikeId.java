@@ -11,6 +11,6 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class CommunityLikeId implements Serializable {      // 복합키 클래스 정의
 
-    private Integer memberCode;
-    private Integer communityPostCode;
+    private int memberCode;
+    private int communityPostCode;
 }

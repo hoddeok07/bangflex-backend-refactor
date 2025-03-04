@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface CommunityLikeRepository extends JpaRepository<CommunityLike, CommunityLikeId> {
 
-    boolean existsByMemberCodeAndCommunityPostCodeAndActiveTrue(Integer memberCode, Integer communityPostCode);
+    boolean existsByMemberCodeAndCommunityPostCodeAndActiveTrue(int memberCode, int communityPostCode);
 
-    List<CommunityLike> findByCommunityPostCodeAndActiveTrue(Integer communityPostCode);
+    List<CommunityLike> findByCommunityPostCodeAndActiveTrue(int communityPostCode);
+
+    int countByCommunityPostCodeAndActiveTrue(int communityPostCode);
 }

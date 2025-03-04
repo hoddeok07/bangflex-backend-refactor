@@ -21,7 +21,7 @@ public class CommunityPost {
     @Id
     @Column(name = "community_post_code")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer communityPostCode;
+    private int communityPostCode;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -34,7 +34,7 @@ public class CommunityPost {
 
     @Column(name = "active", nullable = false)
     @ColumnDefault("TRUE")
-    private Boolean active;
+    private boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_code", nullable = false)

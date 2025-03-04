@@ -184,15 +184,22 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                     CommunityPostDTO postDTO = modelMapper.map(communityPost, CommunityPostDTO.class);
 
                     List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
+
                     List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+
                     boolean isLike = communityLikeRepository
                             .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
                                     loginMember.getMemberCode(), communityPost.getCommunityPostCode());
 
+                    int likeCount = communityLikeRepository
+                            .countByCommunityPostCodeAndActiveTrue(communityPost.getCommunityPostCode());
+
                     postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setProfile(communityPost.getMember().getImage());
                     postDTO.setImageUrls(urls);
-                    postDTO.setIsLike(isLike);
+                    postDTO.setLike(isLike);
+                    postDTO.setLikeCount(likeCount);
+
                     return postDTO;
                 }).toList();
 
@@ -213,13 +220,19 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         selectedPost.setProfile(post.getMember().getImage());
 
         List<CommunityFile> images = communityFileRepository.findByCommunityPost(post);
+
         List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+
         boolean isLike = communityLikeRepository
                 .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
                         loginMember.getMemberCode(), post.getCommunityPostCode());
 
+        int likeCount = communityLikeRepository
+                .countByCommunityPostCodeAndActiveTrue(post.getCommunityPostCode());
+
         selectedPost.setImageUrls(urls);
-        selectedPost.setIsLike(isLike);
+        selectedPost.setLike(isLike);
+        selectedPost.setLikeCount(likeCount);
 
         return selectedPost;
     }
@@ -230,22 +243,30 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         Member loginMember = userRepository.findById(loginId)
                 .orElseThrow(() -> new InvalidUserException("회원가입이 필요합니다."));
 
-        List<CommunityPost> myPosts = communityPostRepository.findByMemberAndActiveTrueOrderByCreatedAtDesc(loginMember);
+        List<CommunityPost> myPosts = communityPostRepository
+                .findByMemberAndActiveTrueOrderByCreatedAtDesc(loginMember);
 
         List<CommunityPostDTO> myPostList = myPosts.stream()
                 .map(communityPost -> {
                     CommunityPostDTO postDTO = modelMapper.map(communityPost, CommunityPostDTO.class);
 
                     List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
+
                     List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+
                     boolean isLike = communityLikeRepository
                             .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
                                     loginMember.getMemberCode(), communityPost.getCommunityPostCode());
 
+                    int likeCount = communityLikeRepository
+                            .countByCommunityPostCodeAndActiveTrue(communityPost.getCommunityPostCode());
+
                     postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setProfile(communityPost.getMember().getImage());
                     postDTO.setImageUrls(urls);
-                    postDTO.setIsLike(isLike);
+                    postDTO.setLike(isLike);
+                    postDTO.setLikeCount(likeCount);
+
                     return postDTO;
                 }).toList();
 

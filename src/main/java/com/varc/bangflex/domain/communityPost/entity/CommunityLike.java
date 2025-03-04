@@ -18,16 +18,16 @@ public class CommunityLike {
 
     @Id
     @Column(name = "member_code")
-    private Integer memberCode;
+    private int memberCode;
 
     @Id
     @Column(name = "community_post_code")
-    private Integer communityPostCode;
+    private int communityPostCode;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "active", nullable = false)
     @ColumnDefault("TRUE")
-    private Boolean active;
+    private boolean active;
 }
