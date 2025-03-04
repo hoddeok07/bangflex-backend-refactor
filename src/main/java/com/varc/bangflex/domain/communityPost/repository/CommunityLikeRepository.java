@@ -10,7 +10,5 @@ public interface CommunityLikeRepository extends JpaRepository<CommunityLike, Co
 
     boolean existsByMemberCodeAndCommunityPostCodeAndActiveTrue(int memberCode, int communityPostCode);
 
-    List<CommunityLike> findByCommunityPostCodeAndActiveTrue(int communityPostCode);
-
     int countByCommunityPostCodeAndActiveTrue(int communityPostCode);
 }

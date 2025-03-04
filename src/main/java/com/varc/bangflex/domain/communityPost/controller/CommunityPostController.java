@@ -1,6 +1,7 @@
 package com.varc.bangflex.domain.communityPost.controller;
 
 import com.varc.bangflex.common.ResponseMessage;
+import com.varc.bangflex.domain.communityPost.dto.CommunityLikeCreateDTO;
 import com.varc.bangflex.domain.communityPost.service.CommunityPostService;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostCreateDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostDTO;
@@ -104,18 +105,18 @@ public class CommunityPostController {
         return ResponseEntity.ok(new ResponseMessage<>(200, "게시글 조회 성공", post));
     }
 
-    /* 게시글 구독 */
-    @GetMapping("/post/subscribe/{communityPostCode}")
-    public ResponseEntity<ResponseMessage<String>> subscribe(
-            @PathVariable Integer communityPostCode,
-            @RequestAttribute("loginId") String loginId
-    ) {
-        log.info("Community post code is {}", communityPostCode);
-        log.info("loginId is {}", loginId);
-        return ResponseEntity.ok(
-                new ResponseMessage<>(200, "구독 완료", "helloworld")
-        );
-    }
+//    /* 게시글 구독 */
+//    @GetMapping("/post/subscribe/{communityPostCode}")
+//    public ResponseEntity<ResponseMessage<String>> subscribe(
+//            @PathVariable Integer communityPostCode,
+//            @RequestAttribute("loginId") String loginId
+//    ) {
+//        log.info("Community post code is {}", communityPostCode);
+//        log.info("loginId is {}", loginId);
+//        return ResponseEntity.ok(
+//                new ResponseMessage<>(200, "구독 완료", "helloworld")
+//        );
+//    }
 
     /* 내가 작성한 게시글 목록 조회 */
     @GetMapping("/my")
@@ -126,5 +127,16 @@ public class CommunityPostController {
 
         List<CommunityPostDTO> myPostList = communityPostService.getMyPosts(loginId);
         return ResponseEntity.ok(new ResponseMessage<>(200, "내가 작성한 게시글 목록 조회 성공", myPostList));
+    }
+
+    /* 게시글 좋아요 등록 및 취소 */
+    @PostMapping("/like")
+    @SecurityRequirement(name = "Authorization")
+    @Operation(summary = "커뮤니티 게시글 좋아요 / 좋아요 취소 API")
+    public ResponseEntity<ResponseMessage<Object>> addLike(@RequestAttribute("loginId") String loginId,
+                                                           @RequestBody CommunityLikeCreateDTO newLike) {
+
+        communityPostService.addLike(loginId, newLike);
+        return ResponseEntity.ok(new ResponseMessage<>(200, "좋아요 또는 좋아요 취소 성공", null));
     }
 }
