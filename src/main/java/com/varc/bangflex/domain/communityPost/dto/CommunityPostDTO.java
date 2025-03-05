@@ -20,6 +20,7 @@ public class CommunityPostDTO {
     private String profile;                 // 회원 프로필 사진
     private boolean liked;                  // 좋아요 여부
     private int likeCount;                  // 좋아요 개수
+    private int commentCount;               // 댓글 개수
 
     // 첨부파일 URL 리스트
     private List<String> imageUrls;         // 첨부파일들

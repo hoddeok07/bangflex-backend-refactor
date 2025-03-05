@@ -1,5 +1,6 @@
 package com.varc.bangflex.domain.communityPost.service;
 
+import com.varc.bangflex.domain.comment.repository.CommentRepository;
 import com.varc.bangflex.domain.communityPost.dto.CommunityLikeCreateDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostCreateDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostDTO;
@@ -38,17 +39,21 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     private final UserRepository userRepository;
     private final CommunityFileRepository communityFileRepository;
     private final CommunityLikeRepository communityLikeRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
     public CommunityPostServiceImpl(ModelMapper modelMapper,
                                     CommunityPostRepository communityPostRepository,
                                     UserRepository userRepository,
-                                    CommunityFileRepository communityFileRepository, CommunityLikeRepository communityLikeRepository) {
+                                    CommunityFileRepository communityFileRepository,
+                                    CommunityLikeRepository communityLikeRepository,
+                                    CommentRepository commentRepository) {
         this.modelMapper = modelMapper;
         this.communityPostRepository = communityPostRepository;
         this.userRepository = userRepository;
         this.communityFileRepository = communityFileRepository;
         this.communityLikeRepository = communityLikeRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Transactional
@@ -196,11 +201,14 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                     int likeCount = communityLikeRepository
                             .countByCommunityPostCodeAndActiveTrue(communityPost.getCommunityPostCode());
 
+                    int commentCount = commentRepository.countByCommunityPostAndActiveTrue(communityPost);
+
                     postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setProfile(communityPost.getMember().getImage());
                     postDTO.setImageUrls(urls);
                     postDTO.setLiked(isLike);
                     postDTO.setLikeCount(likeCount);
+                    postDTO.setCommentCount(commentCount);
 
                     return postDTO;
                 }).toList();
@@ -232,9 +240,12 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         int likeCount = communityLikeRepository
                 .countByCommunityPostCodeAndActiveTrue(post.getCommunityPostCode());
 
+        int commentCount = commentRepository.countByCommunityPostAndActiveTrue(post);
+
         selectedPost.setImageUrls(urls);
         selectedPost.setLiked(isLike);
         selectedPost.setLikeCount(likeCount);
+        selectedPost.setCommentCount(commentCount);
 
         return selectedPost;
     }
@@ -263,11 +274,14 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                     int likeCount = communityLikeRepository
                             .countByCommunityPostCodeAndActiveTrue(communityPost.getCommunityPostCode());
 
+                    int commentCount = commentRepository.countByCommunityPostAndActiveTrue(communityPost);
+
                     postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setProfile(communityPost.getMember().getImage());
                     postDTO.setImageUrls(urls);
                     postDTO.setLiked(isLike);
                     postDTO.setLikeCount(likeCount);
+                    postDTO.setCommentCount(commentCount);
 
                     return postDTO;
                 }).toList();
