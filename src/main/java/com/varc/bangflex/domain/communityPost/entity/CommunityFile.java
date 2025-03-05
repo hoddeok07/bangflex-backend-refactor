@@ -18,7 +18,7 @@ public class CommunityFile {
     @Id
     @Column(name = "community_file_code")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer communityFileCode;
+    private int communityFileCode;
 
     @Column(name = "url", nullable = false)
     private String url;
@@ -28,7 +28,7 @@ public class CommunityFile {
 
     @Column(name = "active", nullable = false)
     @ColumnDefault("TRUE")
-    private Boolean active;
+    private boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_post_code", nullable = false)

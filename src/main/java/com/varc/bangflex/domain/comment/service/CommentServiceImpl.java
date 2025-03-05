@@ -1,6 +1,5 @@
 package com.varc.bangflex.domain.comment.service;
 
-import com.varc.bangflex.domain.comment.dto.CommentCountDTO;
 import com.varc.bangflex.domain.comment.dto.CommentDTO;
 import com.varc.bangflex.domain.comment.entity.Comment;
 import com.varc.bangflex.domain.comment.repository.CommentRepository;
@@ -128,25 +127,6 @@ public class CommentServiceImpl implements CommentService {
                 }).toList();
 
         return allComments;
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public CommentCountDTO getCommentCount(Integer communityPostCode) {
-        CommunityPost foundPost = communityPostRepository.findById(communityPostCode)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
-
-        List<Comment> comments = commentRepository.findByCommunityPostAndActiveTrue(foundPost);
-        Long commentCount = 0L;
-        for (int i = 0; i < comments.size(); i++) {
-            commentCount++;
-        }
-
-        CommentCountDTO count = new CommentCountDTO();
-        count.setCommunityPostCode(communityPostCode);
-        count.setCommentCount(commentCount);
-
-        return count;
     }
 
     @Transactional(readOnly = true)

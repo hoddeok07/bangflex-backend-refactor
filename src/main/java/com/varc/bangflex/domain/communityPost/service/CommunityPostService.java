@@ -1,5 +1,6 @@
 package com.varc.bangflex.domain.communityPost.service;
 
+import com.varc.bangflex.domain.communityPost.dto.CommunityLikeCreateDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostCreateDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostUpdateDTO;
@@ -24,4 +25,6 @@ public interface CommunityPostService {
     List<CommunityPostDTO> getAllPosts(String loginId);
 
     List<CommunityPostDTO> getMyPosts(String loginId);
+
+    void addLike(String loginId, CommunityLikeCreateDTO newLike);
 }

@@ -1,9 +1,12 @@
 package com.varc.bangflex.domain.communityPost.service;
 
+import com.varc.bangflex.domain.comment.repository.CommentRepository;
+import com.varc.bangflex.domain.communityPost.dto.CommunityLikeCreateDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostCreateDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostDTO;
 import com.varc.bangflex.domain.communityPost.dto.CommunityPostUpdateDTO;
 import com.varc.bangflex.domain.communityPost.entity.CommunityFile;
+import com.varc.bangflex.domain.communityPost.entity.CommunityLike;
 import com.varc.bangflex.domain.communityPost.repository.CommunityFileRepository;
 import com.varc.bangflex.domain.communityPost.repository.CommunityLikeRepository;
 import com.varc.bangflex.domain.communityPost.repository.CommunityPostRepository;
@@ -36,17 +39,21 @@ public class CommunityPostServiceImpl implements CommunityPostService {
     private final UserRepository userRepository;
     private final CommunityFileRepository communityFileRepository;
     private final CommunityLikeRepository communityLikeRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
     public CommunityPostServiceImpl(ModelMapper modelMapper,
                                     CommunityPostRepository communityPostRepository,
                                     UserRepository userRepository,
-                                    CommunityFileRepository communityFileRepository, CommunityLikeRepository communityLikeRepository) {
+                                    CommunityFileRepository communityFileRepository,
+                                    CommunityLikeRepository communityLikeRepository,
+                                    CommentRepository commentRepository) {
         this.modelMapper = modelMapper;
         this.communityPostRepository = communityPostRepository;
         this.userRepository = userRepository;
         this.communityFileRepository = communityFileRepository;
         this.communityLikeRepository = communityLikeRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Transactional
@@ -184,15 +191,25 @@ public class CommunityPostServiceImpl implements CommunityPostService {
                     CommunityPostDTO postDTO = modelMapper.map(communityPost, CommunityPostDTO.class);
 
                     List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
+
                     List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+
                     boolean isLike = communityLikeRepository
                             .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
                                     loginMember.getMemberCode(), communityPost.getCommunityPostCode());
 
+                    int likeCount = communityLikeRepository
+                            .countByCommunityPostCodeAndActiveTrue(communityPost.getCommunityPostCode());
+
+                    int commentCount = commentRepository.countByCommunityPostAndActiveTrue(communityPost);
+
                     postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setProfile(communityPost.getMember().getImage());
                     postDTO.setImageUrls(urls);
-                    postDTO.setIsLike(isLike);
+                    postDTO.setLiked(isLike);
+                    postDTO.setLikeCount(likeCount);
+                    postDTO.setCommentCount(commentCount);
+
                     return postDTO;
                 }).toList();
 
@@ -213,13 +230,22 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         selectedPost.setProfile(post.getMember().getImage());
 
         List<CommunityFile> images = communityFileRepository.findByCommunityPost(post);
+
         List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+
         boolean isLike = communityLikeRepository
                 .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
                         loginMember.getMemberCode(), post.getCommunityPostCode());
 
+        int likeCount = communityLikeRepository
+                .countByCommunityPostCodeAndActiveTrue(post.getCommunityPostCode());
+
+        int commentCount = commentRepository.countByCommunityPostAndActiveTrue(post);
+
         selectedPost.setImageUrls(urls);
-        selectedPost.setIsLike(isLike);
+        selectedPost.setLiked(isLike);
+        selectedPost.setLikeCount(likeCount);
+        selectedPost.setCommentCount(commentCount);
 
         return selectedPost;
     }
@@ -230,25 +256,64 @@ public class CommunityPostServiceImpl implements CommunityPostService {
         Member loginMember = userRepository.findById(loginId)
                 .orElseThrow(() -> new InvalidUserException("회원가입이 필요합니다."));
 
-        List<CommunityPost> myPosts = communityPostRepository.findByMemberAndActiveTrueOrderByCreatedAtDesc(loginMember);
+        List<CommunityPost> myPosts = communityPostRepository
+                .findByMemberAndActiveTrueOrderByCreatedAtDesc(loginMember);
 
         List<CommunityPostDTO> myPostList = myPosts.stream()
                 .map(communityPost -> {
                     CommunityPostDTO postDTO = modelMapper.map(communityPost, CommunityPostDTO.class);
 
                     List<CommunityFile> images = communityFileRepository.findByCommunityPost(communityPost);
+
                     List<String> urls = images.stream().map(CommunityFile::getUrl).toList();
+
                     boolean isLike = communityLikeRepository
                             .existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
                                     loginMember.getMemberCode(), communityPost.getCommunityPostCode());
 
+                    int likeCount = communityLikeRepository
+                            .countByCommunityPostCodeAndActiveTrue(communityPost.getCommunityPostCode());
+
+                    int commentCount = commentRepository.countByCommunityPostAndActiveTrue(communityPost);
+
                     postDTO.setNickname(communityPost.getMember().getNickname());
                     postDTO.setProfile(communityPost.getMember().getImage());
                     postDTO.setImageUrls(urls);
-                    postDTO.setIsLike(isLike);
+                    postDTO.setLiked(isLike);
+                    postDTO.setLikeCount(likeCount);
+                    postDTO.setCommentCount(commentCount);
+
                     return postDTO;
                 }).toList();
 
         return myPostList;
+    }
+
+    @Transactional
+    @Override
+    public void addLike(String loginId, CommunityLikeCreateDTO newLike) {
+        CommunityLike addedLike = modelMapper.map(newLike, CommunityLike.class);
+
+        // 회원이 아니라면 예외 발생
+        Member likeMember = userRepository.findById(loginId).orElseThrow(
+                () -> new InvalidUserException("회원가입이 필요합니다."));
+
+        CommunityPost likePost = communityPostRepository.findById(newLike.getCommunityPostCode())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글입니다."));
+
+        addedLike.setMemberCode(likeMember.getMemberCode());
+        addedLike.setCommunityPostCode(likePost.getCommunityPostCode());
+        addedLike.setCreatedAt(LocalDateTime.now());
+
+        // 이미 좋아요가 존재하는지 체크 후 존재하면 좋아요 취소(비활성화)
+        if (communityLikeRepository.existsByMemberCodeAndCommunityPostCodeAndActiveTrue(
+                likeMember.getMemberCode(),
+                likePost.getCommunityPostCode())) {
+            addedLike.setActive(false);
+        } else {
+            addedLike.setActive(true);
+        }
+
+        communityLikeRepository.save(addedLike);
     }
 }

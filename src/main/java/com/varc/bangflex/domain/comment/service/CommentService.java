@@ -1,6 +1,5 @@
 package com.varc.bangflex.domain.comment.service;
 
-import com.varc.bangflex.domain.comment.dto.CommentCountDTO;
 import com.varc.bangflex.domain.comment.dto.CommentDTO;
 import com.varc.bangflex.domain.comment.dto.CommentCreateDTO;
 import com.varc.bangflex.domain.comment.dto.CommentUpdateDTO;
@@ -16,8 +15,6 @@ public interface CommentService {
     void deleteComment(String loginId, Integer communityPostCode, Integer commentCode);
 
     List<CommentDTO> getAllCommentsOfPost(Integer communityPostCode);
-
-    CommentCountDTO getCommentCount(Integer communityPostCode);
 
     List<CommentDTO> getCommentsById(String loginId);
 }

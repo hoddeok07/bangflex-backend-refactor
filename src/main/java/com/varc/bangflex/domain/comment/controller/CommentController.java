@@ -1,7 +1,6 @@
 package com.varc.bangflex.domain.comment.controller;
 
 import com.varc.bangflex.common.ResponseMessage;
-import com.varc.bangflex.domain.comment.dto.CommentCountDTO;
 import com.varc.bangflex.domain.comment.dto.CommentDTO;
 import com.varc.bangflex.domain.comment.dto.CommentCreateDTO;
 import com.varc.bangflex.domain.comment.dto.CommentUpdateDTO;
@@ -75,15 +74,5 @@ public class CommentController {
 
         List<CommentDTO> commentsOfPost = commentService.getAllCommentsOfPost(communityPostCode);
         return ResponseEntity.ok(new ResponseMessage<>(200, "댓글 조회 성공", commentsOfPost));
-    }
-
-    /* 게시글의 댓글 개수 조회 */
-    @GetMapping("/count")
-    @Operation(summary = "커뮤니티 게시글의 댓글 개수 조회 API")
-    public ResponseEntity<ResponseMessage<CommentCountDTO>> getCommentCount(
-                            @PathVariable("communityPostCode") Integer communityPostCode) {
-
-        CommentCountDTO commentCount = commentService.getCommentCount(communityPostCode);
-        return ResponseEntity.ok(new ResponseMessage<>(200, "댓글 개수 조회 성공", commentCount));
     }
 }
